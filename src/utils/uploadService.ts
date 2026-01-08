@@ -5,12 +5,16 @@ export async function uploadImageToCloudinary(
   folderName: string = 'uploads'
 ): Promise<UploadResponse> {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('file', file);
+  formData.append('folder', folderName);
 
-  const apiUrl = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/upload/image`;
+  const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-to-cloudinary`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    },
     body: formData,
   });
 

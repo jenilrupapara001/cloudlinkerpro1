@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Download, FileSpreadsheet, Cloud } from 'lucide-react';
 import FileUploader from './components/FileUploader';
 import UploadProgress from './components/UploadProgress';
@@ -6,39 +6,9 @@ import { ImageUploadStatus } from './types';
 import { uploadImageToCloudinary } from './utils/uploadService';
 import { exportToCSV, exportToExcel } from './utils/exportService';
 
-interface UploadData {
-  id: string;
-  filename: string;
-  originalName: string;
-  secureUrl: string;
-  size: number;
-  format: string;
-  uploadedAt: string;
-}
-
 function App() {
   const [images, setImages] = useState<ImageUploadStatus[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [allUploads, setAllUploads] = useState<UploadData[]>([]);
-
-  useEffect(() => {
-    fetchUploads();
-  }, []);
-
-  const fetchUploads = async () => {
-    try {
-      const apiUrl = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/upload`;
-      const response = await fetch(apiUrl);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setAllUploads(data.uploads);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch uploads:', error);
-    }
-  };
 
   const handleFilesSelected = useCallback(async (files: File[]) => {
     const newImages: ImageUploadStatus[] = files.map(file => ({
@@ -60,10 +30,10 @@ function App() {
       try {
         const result = await uploadImageToCloudinary(image.file, 'cloudlinkerpro');
 
-        if (result.success && result.secure_url) {
+        if (result.success && result.url) {
           setImages(prev => prev.map((img, idx) =>
             idx === i
-              ? { ...img, status: 'completed' as const, url: result.secure_url }
+              ? { ...img, status: 'completed' as const, url: result.url }
               : img
           ));
         } else {
@@ -83,8 +53,6 @@ function App() {
     }
 
     setIsUploading(false);
-    // Refresh uploads after upload
-    fetchUploads();
   }, []);
 
   const handleReset = () => {

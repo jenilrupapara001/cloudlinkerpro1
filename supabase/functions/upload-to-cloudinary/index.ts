@@ -47,7 +47,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME") || "djb3sokjf";
+    const cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME") || "djb3sokjf1";
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY") || "757152597964295";
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET") || "6PDfvmiP_Y0mjIUBDubhBO6dgC8";
 

@@ -1,10 +1,11 @@
 # Cloudinary Upload Server
 
-A production-ready Node.js Express server for direct image upload to Cloudinary.
+A production-ready Node.js Express server for direct image upload to Cloudinary with MongoDB storage.
 
 ## Features
 
 - Direct image upload to Cloudinary
+- MongoDB storage for upload metadata
 - File validation (JPG, JPEG, PNG, WEBP only)
 - File size limit (5MB)
 - Rate limiting
@@ -12,6 +13,7 @@ A production-ready Node.js Express server for direct image upload to Cloudinary.
 - Security headers
 - Error handling
 - Health check endpoint
+- Get all uploads endpoint
 
 ## Installation
 
@@ -25,11 +27,14 @@ A production-ready Node.js Express server for direct image upload to Cloudinary.
    npm install
    ```
 
-3. Create a `.env` file with your Cloudinary credentials:
+3. Install MongoDB locally or use MongoDB Atlas.
+
+4. Create a `.env` file with your credentials:
    ```env
    CLOUDINARY_CLOUD_NAME=your_cloud_name
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
+   MONGODB_URI=mongodb://localhost:27017/cloudinary-uploads
    PORT=3000
    ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
    ```
@@ -71,6 +76,28 @@ Upload an image file to Cloudinary.
 }
 ```
 
+### GET /api/uploads
+
+Get all uploaded images metadata.
+
+**Response:**
+```json
+{
+  "success": true,
+  "uploads": [
+    {
+      "id": "507f1f77bcf86cd799439011",
+      "filename": "image.jpg",
+      "originalName": "my-image.jpg",
+      "secureUrl": "https://res.cloudinary.com/.../image.jpg",
+      "size": 1024000,
+      "format": "jpg",
+      "uploadedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
 ### GET /health
 
 Health check endpoint.
@@ -103,9 +130,12 @@ Health check endpoint.
 ```
 server/
 ├── config/
-│   └── cloudinary.js      # Cloudinary configuration
+│   ├── cloudinary.js      # Cloudinary configuration
+│   └── database.js        # MongoDB connection
 ├── middleware/
 │   └── multer.js          # Multer storage setup
+├── models/
+│   └── Upload.js          # MongoDB upload model
 ├── routes/
 │   └── upload.js          # Upload routes
 ├── .env                   # Environment variables

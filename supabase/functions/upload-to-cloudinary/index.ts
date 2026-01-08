@@ -47,9 +47,9 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME") || "djb3sokjf";
-    const apiKey = Deno.env.get("CLOUDINARY_API_KEY") || "757152597964295";
-    const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET") || "6PDfvmiP_Y0mjIUBDubhBO6dgC8";
+    const cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME") || "dukqpcb7p";
+    const apiKey = Deno.env.get("CLOUDINARY_API_KEY") || "313914632924971";
+    const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET") || "ekrJqXSJVNRgncP8IuqvEpKxrT4";
 
     const timestamp = Math.floor(Date.now() / 1000);
     const paramsString = `folder=${folderName}&timestamp=${timestamp}`;

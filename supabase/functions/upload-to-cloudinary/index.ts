@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,6 +31,40 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        {
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        {
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const folderName = formData.get("folder") as string || "uploads";
@@ -51,9 +86,16 @@ Deno.serve(async (req: Request) => {
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY") || "313914632924971";
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET") || "ekrJqXSJVNRgncP8IuqvEpKxrT4";
 
+    console.log("Using cloudName:", cloudName);
+    console.log("Using apiKey:", apiKey ? apiKey.substring(0, 5) + "..." : "not set");
+    console.log("Using apiSecret:", apiSecret ? "set" : "not set");
+
     const timestamp = Math.floor(Date.now() / 1000);
     const paramsString = `folder=${folderName}&timestamp=${timestamp}`;
     const signature = await generateSignature(paramsString, apiSecret);
+
+    console.log("Params string:", paramsString);
+    console.log("Generated signature:", signature);
 
     const cloudinaryFormData = new FormData();
     cloudinaryFormData.append("file", file);
@@ -70,6 +112,9 @@ Deno.serve(async (req: Request) => {
     });
 
     const result = await response.json();
+
+    console.log("Cloudinary response status:", response.status);
+    console.log("Cloudinary response:", result);
 
     if (!response.ok) {
       return new Response(

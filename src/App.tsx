@@ -27,7 +27,7 @@ function App() {
 
   const fetchUploads = async () => {
     try {
-      const apiUrl = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/uploads`;
+      const apiUrl = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/api/upload`;
       const response = await fetch(apiUrl);
       if (response.ok) {
         const data = await response.json();

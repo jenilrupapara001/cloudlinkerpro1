@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import dotenv from 'dotenv';
+import connectDB from './config/database.js';
 import uploadRoutes from './routes/upload.js';
 
 // Load environment variables
@@ -84,11 +85,14 @@ app.use('*', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log(`Upload endpoint: POST http://localhost:${PORT}/api/upload/image`);
+// Connect to database and start server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/health`);
+    console.log(`Upload endpoint: POST http://localhost:${PORT}/api/upload/image`);
+    console.log(`Get uploads: GET http://localhost:${PORT}/api/uploads`);
+  });
 });
 
 export default app;
